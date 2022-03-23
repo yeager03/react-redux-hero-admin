@@ -1,8 +1,9 @@
 import { useHttp } from "../../hooks/http.hook";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { createSelector } from "reselect";
 
-import { heroesFetching, heroesFetched, heroesFetchingError, heroDelete, filterHeroes } from "../../actions";
+import { heroDelete, fetchHeroes } from "../../actions";
 import HeroesListItem from "../heroesListItem/HeroesListItem";
 import Spinner from "../spinner/Spinner";
 
@@ -12,16 +13,26 @@ import Spinner from "../spinner/Spinner";
 // Удаление идет и с json файла при помощи метода DELETE
 
 const HeroesList = () => {
-	const { filteredHeroes, heroesLoadingStatus } = useSelector((state) => state);
+	const filteredHeroesSelector = createSelector(
+		(state) => state.filters.selectedFilter,
+		(state) => state.heroes.heroes,
+		(selectedFilter, heroes) => {
+			if (selectedFilter === "all") {
+				// console.log("render");
+				return heroes;
+			} else {
+				return heroes.filter((hero) => hero.element === selectedFilter);
+			}
+		}
+	);
+
+	const filteredHeroes = useSelector(filteredHeroesSelector);
+	const heroesLoadingStatus = useSelector((state) => state.heroes.heroesLoadingStatus);
 	const dispatch = useDispatch();
 	const { request } = useHttp();
 
 	useEffect(() => {
-		dispatch(heroesFetching());
-		request("http://localhost:3001/heroes")
-			.then((data) => dispatch(heroesFetched(data)))
-			.catch(() => dispatch(heroesFetchingError()));
-
+		dispatch(fetchHeroes(request));
 		// eslint-disable-next-line
 	}, []);
 
@@ -43,6 +54,7 @@ const HeroesList = () => {
 	}
 
 	const renderHeroesList = (arr) => {
+		// console.log("rendered hero list");
 		if (arr.length === 0) {
 			return <h5 className="text-center mt-5">Героев пока нет</h5>;
 		}

@@ -9,7 +9,7 @@ import { selecteFilter } from "../../actions";
 // Представьте, что вы попросили бэкенд-разработчика об этом
 
 const HeroesFilters = () => {
-	const { filters, filtersLoadingStatus, selectedFilter } = useSelector((state) => state);
+	const { filters, filtersLoadingStatus, selectedFilter } = useSelector((state) => state.filters);
 	const dispatch = useDispatch();
 
 	const selectFilter = (name) => dispatch(selecteFilter(name));

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHttp } from "../../hooks/http.hook";
 
-import { filtersFetching, filtersFetched, filtersFetchingError, heroAdd } from "../../actions";
+import { heroAdd, fetchFilters } from "../../actions";
 import { v4 as uuidv4 } from "uuid";
 
 // Задача для этого компонента:
@@ -23,15 +23,12 @@ const HeroesAddForm = () => {
 	});
 	const { name, text, element } = state;
 
-	const { filters, filtersLoadingStatus } = useSelector((state) => state);
+	const { filters, filtersLoadingStatus } = useSelector((state) => state.filters);
 	const dispatch = useDispatch();
 	const { request } = useHttp();
 
 	useEffect(() => {
-		dispatch(filtersFetching());
-		request("http://localhost:3001/filters")
-			.then((filters) => dispatch(filtersFetched(filters)))
-			.catch(() => dispatch(filtersFetchingError()));
+		dispatch(fetchFilters(request));
 		// eslint-disable-next-line
 	}, []);
 
